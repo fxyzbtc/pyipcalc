@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyipcalc" # Changed name
+version = "0.1.2"
+description = "A utility to calculate ipv4, ipv6 network information."
+
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "loguru>=0.7.3",
+    "typer>=0.12.5", # Added typer
+]
+
+[project.scripts]
+pyipcalc = "pyipcalc.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/fxyzbtc/pyipcalc" # Replace with your actual URL
+Repository = "https://github.com/fxyzbtc/pyipcalc" # Replace with your actual URL
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "pytest>=8.3.5",
+]
+
+[tool.uv.sources]
+pyipcalc = { path = "pyipcalc", editable = true } # Corrected path
+
+[tool.setuptools]
+# Explicitly map the package root "" to the src directory
+package-dir = {"" = "pyipcalc"}
