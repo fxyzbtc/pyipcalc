@@ -1,8 +1,8 @@
 """Data models for IP calculator."""
 
-from typing import List, Optional, Union
+from typing import List, Optional
 from dataclasses import dataclass
-from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address
+from ipaddress import IPv4Address
 
 
 @dataclass
@@ -56,6 +56,8 @@ def get_ipv4_class(address: IPv4Address) -> str:
     
     if 1 <= first_octet <= 126:
         return "A"
+    elif first_octet == 127:
+        return "A (Loopback)"
     elif 128 <= first_octet <= 191:
         return "B"
     elif 192 <= first_octet <= 223:

@@ -1,7 +1,6 @@
 """IP Calculator utility functions."""
 
 import ipaddress
-import re
 from typing import List, Union, Tuple
 from loguru import logger
 
@@ -155,14 +154,34 @@ class IPCalculator:
         subnets = []
         current_prefix = network.prefixlen
         
-        # Common IPv6 subnet boundaries
-        common_prefixes = [48, 56, 60, 64, 72, 80, 96, 112]
+        # Common IPv6 subnet boundaries with special handling
+        important_prefixes = [48, 56, 60, 64]  # Most common IPv6 subnet sizes
         
-        for prefix_len in common_prefixes:
-            if prefix_len > current_prefix:
+        for prefix_len in important_prefixes:
+            if prefix_len > current_prefix and prefix_len <= 128:
                 subnet_count = 2 ** (prefix_len - current_prefix)
-                if subnet_count <= 65536:  # Reasonable limit
+                
+                if subnet_count <= 65536:
                     subnets.append(f"/{prefix_len} ({subnet_count} subnets)")
+                elif subnet_count <= 2**20:  # Up to ~1M
+                    k_count = subnet_count // 1024
+                    subnets.append(f"/{prefix_len} ({k_count}K subnets)")
+                elif subnet_count <= 2**30:  # Up to ~1B
+                    m_count = subnet_count // (1024 * 1024)
+                    subnets.append(f"/{prefix_len} ({m_count}M subnets)")
+                else:
+                    # For very large counts, use scientific notation
+                    exp = prefix_len - current_prefix
+                    subnets.append(f"/{prefix_len} (2^{exp} subnets)")
+        
+        # Add a few more if we have room
+        additional_prefixes = [72, 80, 96, 112]
+        for prefix_len in additional_prefixes:
+            if len(subnets) >= 6:  # Limit total entries
+                break
+            if prefix_len > current_prefix and prefix_len <= 128:
+                exp = prefix_len - current_prefix
+                subnets.append(f"/{prefix_len} (2^{exp} subnets)")
         
         return subnets[:8]  # Limit to 8 entries
     
